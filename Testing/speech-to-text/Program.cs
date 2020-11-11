@@ -29,7 +29,15 @@ namespace speech_to_text
             }
         }
 
-        public static string DEMO_FILE = "Recording.wav";
+        async static Task FromFile(SpeechConfig speechConfig)
+        {
+            using var audioConfig = AudioConfig.FromWavFileInput(DEMO_FILE);
+            using var recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+
+            var result = await recognizer.RecognizeOnceAsync();
+            Console.WriteLine($"RECOGNIZED: Text={result.Text}");
+        }
+        public static string DEMO_FILE = "";
         
         public static string ConvertMp3ToWav(String inputMp3FilePath, String outputWavFilePath)  
         {  
@@ -63,13 +71,11 @@ namespace speech_to_text
             //     }
             // }
 
-            ConvertMp3ToWav("Recording.m4a","Recording2.wav");
+            DEMO_FILE = ConvertMp3ToWav("Recording.m4a","Recording2.wav");
 
             DotNetEnv.Env.Load(".env");
-            Console.WriteLine(DotNetEnv.Env.GetString("SPEECH_TO_TEXT_KEY"));
-            Console.WriteLine(DotNetEnv.Env.GetString("SPEECH_TO_TEXT_REGION_KEY"));
-            // var speechConfig = SpeechConfig.FromSubscription("", "");
-            // await FromMic(speechConfig);
+            var speechConfig = SpeechConfig.FromSubscription(DotNetEnv.Env.GetString("SPEECH_TO_TEXT_KEY"), DotNetEnv.Env.GetString("SPEECH_TO_TEXT_REGION_KEY"));
+            await FromFile(speechConfig);
             
         }
     }
