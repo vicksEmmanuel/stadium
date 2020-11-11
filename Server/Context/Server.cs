@@ -12,5 +12,7 @@ namespace Context
         }
 
         public DbSet<Users> Users { get; set; }
+        public DbSet<Sport> Sports { get; set; }
+        public DbSet<Team> Teams { get; set; }
     }
 }

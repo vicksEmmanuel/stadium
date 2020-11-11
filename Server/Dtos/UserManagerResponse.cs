@@ -8,6 +8,6 @@ namespace Dtos {
         public bool IsSuccess { get; set; }
         public IEnumerable<string> Errors { get; set; }
         public DateTime? ExpirationDate { get; set; }
-        public UsersDto? Data { get; set; }
+        public dynamic? Data { get; set; }
     }
 }
