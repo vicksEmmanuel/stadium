@@ -37,6 +37,26 @@ namespace speech_to_text
             var result = await recognizer.RecognizeOnceAsync();
             Console.WriteLine($"RECOGNIZED: Text={result.Text}");
         }
+
+        async static Task FromStream(SpeechConfig speechConfig)
+        {
+            var reader = new BinaryReader(File.OpenRead(DEMO_FILE));
+            Console.WriteLine(reader.ToString());
+            using var audioInputStream = AudioInputStream.CreatePushStream();
+            using var audioConfig = AudioConfig.FromStreamInput(audioInputStream);
+            using var recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+
+            byte[] readBytes;
+            do
+            {
+                readBytes = reader.ReadBytes(1024);
+                audioInputStream.Write(readBytes, readBytes.Length);
+            } while (readBytes.Length > 0);
+
+            var result = await recognizer.RecognizeOnceAsync();
+            Console.WriteLine($"RECOGNIZED: Text={result.Text}");
+        }
+
         public static string DEMO_FILE = "";
         
         public static string ConvertMp3ToWav(String inputMp3FilePath, String outputWavFilePath)  
@@ -75,7 +95,7 @@ namespace speech_to_text
 
             DotNetEnv.Env.Load(".env");
             var speechConfig = SpeechConfig.FromSubscription(DotNetEnv.Env.GetString("SPEECH_TO_TEXT_KEY"), DotNetEnv.Env.GetString("SPEECH_TO_TEXT_REGION_KEY"));
-            await FromFile(speechConfig);
+            await FromStream(speechConfig);
             
         }
     }

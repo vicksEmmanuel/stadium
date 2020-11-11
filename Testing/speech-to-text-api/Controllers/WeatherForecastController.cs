@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Middleware;
 
-namespace server.Controllers
+namespace speech_to_text_api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -17,10 +18,12 @@ namespace server.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly Manager _manager;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, Manager manager)
         {
             _logger = logger;
+            _manager = manager;
         }
 
         [HttpGet]
@@ -35,5 +38,10 @@ namespace server.Controllers
             })
             .ToArray();
         }
+
+        // [HttpGet]
+        // public async Task<ActionResult> VoiceOver() {
+            
+        // }
     }
 }

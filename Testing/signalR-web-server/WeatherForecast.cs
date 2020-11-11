@@ -1,6 +1,6 @@
 using System;
 
-namespace server
+namespace signalr_web_server
 {
     public class WeatherForecast
     {
