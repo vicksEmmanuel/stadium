@@ -4,22 +4,21 @@ using Microsoft.AspNetCore.Http;
 
 namespace Models
 {
-    public class Team {
+    public class Players {
         [Key]
         public int Id { get; set; }
         [Required]
-        [StringLength(50, MinimumLength = 5)]
+        [StringLength(100, MinimumLength = 5)]
         public string Name { get; set; }
         [Required]
-        public virtual int SportId { get; set; }   
+        public virtual int TeamId { get; set; }   
         
-        [ForeignKey("SportId")]     
-        public virtual Sport Sports{ get; set; }
+        [ForeignKey("TeamId")]     
+        public virtual Team Teams{ get; set; }
         public string ImageName { get; set; }
         [NotMapped]
         public string ImageSrc { get; set; }
         [NotMapped]
         public IFormFile ImageFile { get; set; }
-        
     }
 }

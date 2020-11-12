@@ -20,15 +20,9 @@ using Models;
 namespace Services
 {
     public interface IAdminService {
-        Task<UserManagerResponse> CreateTeamAsync(Team model);
-        Task<UserManagerResponse> CreateSportAsync(Sport model);
-        Task<UserManagerResponse> GetAllTeamAsync();
-        Task<UserManagerResponse> GetTeamAsync(int id);
-        Task<UserManagerResponse> GetAllSportAsync();
-        Task<UserManagerResponse> GetSportAsync(int id);
-        // Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token);
-        // Task<UserManagerResponse> ForgotPasswordAsync(string email);
-        // Task<UserManagerResponse> ResetPasswordAsync(ResetPassword model);
+        Task<UserManagerResponse> CreateTeamAsync(Team model, string email);
+        Task<UserManagerResponse> CreateSportAsync(Sport model, string email);
+        Task<UserManagerResponse> CreateTeamMemberAsync(Players model, string email);
     }
 
     public class AdminService : IAdminService
@@ -58,10 +52,10 @@ namespace Services
         }
 
         [NonAction]
-        public async Task<string> SaveImage(IFormFile imageFile) {
+        public async Task<string> SaveImage(IFormFile imageFile, string spec) {
             string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
             imageName = imageName+DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
-            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images\\Team", imageName);
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images\\"+spec, imageName);
             using (var fileStream = new FileStream(imagePath, FileMode.Create)) {
                 await imageFile.CopyToAsync(fileStream);
             }
@@ -79,34 +73,79 @@ namespace Services
             return isAdmin.UserType == "Admin";
         }
 
-        public Task<UserManagerResponse> CreateTeamAsync(Team model)
+        public async Task<UserManagerResponse> CreateTeamAsync(Team model, string email)
         {
-            throw new NotImplementedException();
+            if(!CheckIfAdmin(email)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
+
+            if (model.ImageFile != null) {
+                model.ImageName = await SaveImage(model.ImageFile, "Team");
+                _dbContext.Teams.Add(model);
+                await _dbContext.SaveChangesAsync();
+                return new UserManagerResponse {
+                    Message = "Team created",
+                    IsSuccess = true
+                };
+            } else {
+                return new UserManagerResponse {
+                    Message = "Add an Image",
+                    IsSuccess = false
+                };
+            }
         }
 
-        public Task<UserManagerResponse> CreateSportAsync(Sport model)
+        public async Task<UserManagerResponse> CreateSportAsync(Sport model, string email)
         {
-            throw new NotImplementedException();
+             if(!CheckIfAdmin(email)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
+
+            if (model.ImageFile != null) {
+                model.ImageName = await SaveImage(model.ImageFile,"Sport");
+                _dbContext.Sports.Add(model);
+                await _dbContext.SaveChangesAsync();
+                return new UserManagerResponse {
+                    Message = "Sport created",
+                    IsSuccess = true
+                };
+            } else {
+                return new UserManagerResponse {
+                    Message = "Add an Image",
+                    IsSuccess = false
+                };
+            }
         }
 
-        public Task<UserManagerResponse> GetAllTeamAsync()
+        public async Task<UserManagerResponse> CreateTeamMemberAsync(Players model, string email)
         {
-            throw new NotImplementedException();
-        }
+            if(!CheckIfAdmin(email)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
 
-        public Task<UserManagerResponse> GetTeamAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserManagerResponse> GetAllSportAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserManagerResponse> GetSportAsync(int id)
-        {
-            throw new NotImplementedException();
+            if (model.ImageFile != null) {
+                model.ImageName = await SaveImage(model.ImageFile, "Members");
+                _dbContext.Players.Add(model);
+                await _dbContext.SaveChangesAsync();
+                return new UserManagerResponse {
+                    Message = "Member created",
+                    IsSuccess = true
+                };
+            } else {
+                return new UserManagerResponse {
+                    Message = "Add an Image",
+                    IsSuccess = false
+                };
+            }
         }
     }
 }

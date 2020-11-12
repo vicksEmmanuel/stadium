@@ -65,6 +65,7 @@ namespace server
 
             services.AddScoped<IAdminAuthService, AdminAuthService>();
             services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IAppService, AppierService>();
             services.AddTransient<IMailService,  SendEmail>();
 
             services.AddControllers().AddNewtonsoftJson(s => {
