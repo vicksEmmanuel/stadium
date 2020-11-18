@@ -8,14 +8,20 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Context;
 using Dtos;
+using Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
+using Microsoft.Net.Http.Server;
 using Models;
+using Newtonsoft.Json;
 
 namespace Services
 {
@@ -23,6 +29,7 @@ namespace Services
         Task<UserManagerResponse> CreateTeamAsync(Team model, string email);
         Task<UserManagerResponse> CreateSportAsync(Sport model, string email);
         Task<UserManagerResponse> CreateTeamMemberAsync(Players model, string email);
+        Task<UserManagerResponse> GoLive(int teamId, string adminEmail, HttpRequest request);
     }
 
     public class AdminService : IAdminService
@@ -34,13 +41,16 @@ namespace Services
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IMapper _mapper;
 
+        private readonly IHubContext<NotificationHub> _hubContext;
+
         public AdminService(
             IWebHostEnvironment hostEnvironment, 
             Server dbContext, 
             UserManager<IdentityUser> userManager, 
             IConfiguration configuration, 
             IMailService mailService,
-            IMapper mapper
+            IMapper mapper,
+            IHubContext<NotificationHub> hubContext
         )
         {
             _userManager = userManager;
@@ -49,6 +59,7 @@ namespace Services
             _dbContext = dbContext;
             _hostEnvironment = hostEnvironment;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [NonAction]
@@ -72,6 +83,72 @@ namespace Services
 
             return isAdmin.UserType == "Admin";
         }
+
+        [NonAction]
+         public async Task<UserManagerResponse> CreateUserNotification(NotificationModel model, string email) {
+            var isUser = _dbContext.Users.FirstOrDefault(e => e.Email.ToLower() == email.ToLower());
+
+            if(isUser == null) {
+                return new UserManagerResponse {
+                    Message = "Not a User",
+                    IsSuccess = false
+                };
+            }
+
+            model.UserId = isUser.Id;
+            _dbContext.NotificationModel.Add(model);
+            await _dbContext.SaveChangesAsync();
+            return new UserManagerResponse {
+                Message = "Notification created",
+                IsSuccess = true,
+                Data = _mapper.Map<NotificationModelDto>(model)
+            };
+        }
+
+        public async Task<UserManagerResponse> GoLive(int teamId, string adminEmail, HttpRequest request) {
+            if(!CheckIfAdmin(adminEmail)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
+            var team = _dbContext.Teams.FirstOrDefault(x => x.Id == teamId);
+            if(team == null) {
+                return new UserManagerResponse {
+                    Message = "Team does not exist",
+                    IsSuccess = false
+                };
+            }
+            var usersWhoFollowsTeam = _dbContext.Follows.Where(x => x.TeamId == team.Id).ToArray();
+            foreach(var user in usersWhoFollowsTeam) {
+                var model = new NotificationModel() {
+                    Message = $"{team.Name} is now live at {DateTime.Now.TimeOfDay.ToString()}",
+                    Type = "GO_LIVE",
+                    CreatedDate = DateTime.Now,
+                    IsRead = false,
+                    UserId = user.Id,
+                    IsRecurring = false,
+                    TeamId = teamId
+                };
+                var message = JsonConvert.SerializeObject(model);
+                var registeredNotification = _dbContext.NotificationHubModels
+                        .FirstOrDefault(x => x.UserId == user.UserId);
+                if (registeredNotification != null & registeredNotification.isOpen) {
+                    await _hubContext.Clients
+                    .Client(registeredNotification.ConnectionId)
+                    .SendAsync("RecieveMessage", message);
+                }
+                await CreateUserNotification(model, _dbContext.Users.FirstOrDefault(x => x.Id == user.Id).Email);
+            }
+
+            return new UserManagerResponse {
+                Message = "Gone live",
+                IsSuccess = true
+            };
+
+        }
+
+
 
         public async Task<UserManagerResponse> CreateTeamAsync(Team model, string email)
         {

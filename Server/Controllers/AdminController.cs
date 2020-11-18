@@ -22,6 +22,24 @@ namespace Controllers {
         }
 
         [Authorize]
+        [HttpGet("golive/{teamId}")]
+        public async Task<IActionResult> GoLive(int teamId) {
+            if (ModelState.IsValid) {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var email = user?.Email;
+
+                var result = await _adminService.GoLive(teamId, email, Request);
+                if(result.IsSuccess) {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        [Authorize]
         [HttpPost("create/team")]
         public async Task<IActionResult> CreateTeamAsync ([FromForm] Team team) {
             if (ModelState.IsValid) {

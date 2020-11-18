@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>SignalR Javascript Client</title>
+    </head>
+    <body>
+        <h1>SignalR Javascript Client</h1>
+        <p id="stateLabel">Ready to connect</p>
+        <p id="connIDLabel">ConnID: N/a</p>
+        <div>
+            <label for="connectionUrl">SignalR Server Url:</label>
+            <input id="connectionUrl" />
+            <button id="connectButton" type="submit">Connect</button>
+            <button id="closeButton" disabled>Close Socket</button>
+        </div>
+        <p></p>
+        <div>
+            <label for="sendMessage">Message:</label>
+            <input id="sendMessage" disabled />
+            <button id="sendButton" type="submit" disabled>Send</button>
+        </div>
+        <p></p>
+        <div>
+            <label for="recipents">Recipents ID:</label>
+            <input id="recipents" disabled />
+        </div>
+        <p></p>
+        <h2>Comunication Log</h2>
+        <table style="width: 800px;">
+            <thread>
+                <tr>
+                    <td style="width: 100px;">From</td>
+                    <td style="width: 100px;">To</td>
+                    <td>Data</td>
+                </tr>
+            </thread>
+            <tbody id="commsLog">
+
+            </tbody>
+        </table>
+    </body>
+    <script src="lib/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var connectionUrl = document.getElementById("connectionUrl");
+        var connectButton = document.getElementById("connectButton");
+        var stateLabel = document.getElementById("stateLabel");
+        var sendMessage = document.getElementById("sendMessage");
+        var sendButton = document.getElementById("sendButton");
+        var commsLog = document.getElementById("commsLog");
+        var closeButton = document.getElementById("closeButton");
+        var redipents = document.getElementById("recipents");
+        var connID = document.getElementById("connIDLabel");
+
+        connectionUrl.value = "http://localhost:5000/hubs/notification";
+
+        var hubConnection = new signalR
+                .HubConnectionBuilder()
+                .withUrl(connectionUrl.value, {
+                    accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InZpY2tzZW1tYW51ZWw1OEBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjA0ODlmNjQ4LTk3ODctNDhjZi05NjZlLThmYWU2MjE2YTk0MSIsImV4cCI6MTYwNzc4NTY1NSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIn0.MA-D9ygoNQcHQA9H64ZVhohwTEnpXefyO_VkuuDx0pA",
+                }).build();
+
+        connectButton.onclick = () => {
+            stateLabel.innerHTML = "Attempting to connect...";
+            hubConnection.start().then(() => {
+                updateState();
+                commsLog.innerHTML += '<tr>' +
+                '<td colspan="3">Connection opened</td>'+
+                '</tr>';
+            });
+
+            closeButton.onclick = function() {
+                if(!hubConnection || hubConnection.state !== "Connected") {
+                    alert("Hub not connected");
+                }
+                
+                hubConnection.stop().then(() => {
+                    console.debug("Requested stop on hub");
+                });
+            }
+
+            hubConnection.onclose(e => {
+                updateState();
+                commsLog.innerHTML += '<tr>' +
+                '<td colspan="3">Connection closed. Code:</td>'+
+                '</tr>';
+            })
+
+            hubConnection.on("RecieveConnId", connid => {
+                connID.innerHTML = "ConnID: " + connid;
+                commsLog.innerHTML += '<tr>' +
+                '<td colspan="3">Connection ID recieved from Hub</td>'+
+                '</tr>';
+            })
+
+            hubConnection.on("RecieveMessage", message => {
+                alert(message);
+                commsLog.innerHTML += '<tr>' +
+                '<td>Server</td>' +
+                '<td>Client</td>' +
+                '<td>' + htmlEscape(message) + '</td>'+
+                '</tr>';
+            });
+
+            function updateState () {
+                let disabled = () => {
+                    sendMessage.disabled = true;
+                    sendButton.disabled = true;
+                    closeButton.disabled = true;
+                    recipents.disabled = true;
+                }
+                let enabled = () => {
+                    sendMessage.disabled = false;
+                    sendButton.disabled = false;
+                    closeButton.disabled = false;
+                    recipents.disabled = false;
+                }
+                connectionUrl.disabled = true;
+                connectButton.disabled = true;
+                if (!hubConnection) {
+                    disabled();
+                } else {
+                    switch(hubConnection.state){
+                        case "Disconnected":
+                            stateLabel.innerHTML = "Closed";
+                            connID.innerHTML = "ConnID: N/a";
+                            disabled();
+                            connectionUrl.disabled = false;
+                            connectButton.disabled = false;
+                            break;
+                        case "Connecting":
+                            stateLabel.innerHTML = "Connecting...";
+                            disabled();
+                            break;
+                        case "Connected":
+                            stateLabel.innerHTML = "Open";
+                            enabled();
+                            break;
+                        default:
+                            stateLabel.innerHTML = "Unknown Websocket State - unknown " + hubConnection.state;
+                            disabled();
+                            break;
+                    }
+                }
+            }
+
+            sendButton.onclick = function() {
+                if(!hubConnection ||hubConnection.state !== "Connected") {
+                    alert("Socket not connected");
+                }
+
+                var data = constructJSON();
+                hubConnection.invoke("SendMessageAsync", data);
+            }
+
+
+
+            function constructJSON() {
+                return JSON.stringify({
+                    "From": connID.innerHTML.substring(8, connID.innerHTML.length),
+                    "To": recipents.value,
+                    "Message": sendMessage.value
+                });
+            }
+
+            function htmlEscape(str) {
+                return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            }
+
+            
+        }
+
+    </script>
+</html>

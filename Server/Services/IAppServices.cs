@@ -31,6 +31,11 @@ namespace Services
         Task<UserManagerResponse> GetPlayerAsync(HttpRequest request, int id);
         Task<UserManagerResponse> GetAllSportAsync(HttpRequest request);
         Task<UserManagerResponse> GetSportAsync(HttpRequest request, int id);
+
+        Task<UserManagerResponse> GetAllNotificationOfUser(string email);
+        Task<UserManagerResponse> CreateUserNotification(NotificationModel notification, string email);
+
+        Task<UserManagerResponse> FollowClubInterest(int[] club, string email);
     }
 
     public class AppierService : IAppService
@@ -79,6 +84,83 @@ namespace Services
                 return false;
 
             return isAdmin.UserType == "Admin";
+        }
+
+        public async Task<UserManagerResponse> FollowClubInterest(int[] clubs, string email) {
+            var isUser = _dbContext.Users.FirstOrDefault(e => e.Email.ToLower() == email.ToLower());
+
+            if(isUser == null) {
+                return new UserManagerResponse {
+                    Message = "Not a User",
+                    IsSuccess = false
+                };
+            }
+
+            foreach(var club in clubs) {
+                var isTeam = _dbContext.Teams.FirstOrDefault(e => e.Id == club);
+
+                if(isTeam != null) {
+                    _dbContext.Follows.Add(new Follow() {
+                        UserId = isUser.Id,
+                        TeamId = isTeam.Id
+                    });
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return  new UserManagerResponse {
+                Message = "Followed teams",
+                IsSuccess = true
+            };
+        }
+
+        public async Task<UserManagerResponse> CreateUserNotification(NotificationModel model, string email) {
+            var isUser = _dbContext.Users.FirstOrDefault(e => e.Email.ToLower() == email.ToLower());
+
+            if(isUser == null) {
+                return new UserManagerResponse {
+                    Message = "Not a User",
+                    IsSuccess = false
+                };
+            }
+
+            model.UserId = isUser.Id;
+            _dbContext.NotificationModel.Add(model);
+            await _dbContext.SaveChangesAsync();
+            return new UserManagerResponse {
+                Message = "Notification created",
+                IsSuccess = true,
+                Data = _mapper.Map<NotificationModelDto>(model)
+            };
+        }
+
+        public async Task<UserManagerResponse> GetAllNotificationOfUser(string email) {
+             var isUser = await _dbContext.Users.FirstOrDefaultAsync(e => e.Email.ToLower() == email.ToLower());
+
+            if(isUser == null) {
+                return new UserManagerResponse {
+                    Message = "Not a User",
+                    IsSuccess = false
+                };
+            }
+
+            var data = _dbContext.NotificationModel.Where(x => x.UserId == isUser.Id);
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                    Data = new int[0]
+                };
+            }
+
+            return new UserManagerResponse{
+                Message = "Notifications",
+                IsSuccess = false,
+                Data = _mapper.Map<IEnumerable<NotificationModelDto>>(data)
+            };
+
         }
 
         public async Task<UserManagerResponse> GetAllTeamAsync(HttpRequest request)

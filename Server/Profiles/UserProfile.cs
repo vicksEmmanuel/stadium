@@ -10,6 +10,8 @@ namespace Profiles {
             CreateMap<Team, TeamDto>();
             CreateMap<Sport, SportDto>();
             CreateMap<Players, PlayersDto>();
+            CreateMap<NotificationModel, NotificationModelDto>();
+            CreateMap<NotificationModelDto, NotificationModel>();
         }
     }
 }

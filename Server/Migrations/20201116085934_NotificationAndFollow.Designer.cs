@@ -4,14 +4,16 @@ using Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace server.Migrations
 {
     [DbContext(typeof(Server))]
-    partial class ServerModelSnapshot : ModelSnapshot
+    [Migration("20201116085934_NotificationAndFollow")]
+    partial class NotificationAndFollow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,36 +239,6 @@ namespace server.Migrations
                     b.ToTable("Follows");
                 });
 
-            modelBuilder.Entity("Models.NotificationHubModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("ConnectionId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isOpen")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("NotificationHubModels");
-                });
-
             modelBuilder.Entity("Models.NotificationModel", b =>
                 {
                     b.Property<int>("Id")
@@ -482,17 +454,6 @@ namespace server.Migrations
                         .IsRequired();
 
                     b.Navigation("Teams");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Models.NotificationHubModel", b =>
-                {
-                    b.HasOne("Models.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Users");
                 });

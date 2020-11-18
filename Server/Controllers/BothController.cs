@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
@@ -11,8 +15,68 @@ namespace Controllers {
     public class BothController : ControllerBase {
         private readonly IMapper _mapper;
         private readonly IAppService _service;
-        public BothController(IAppService service) {
+        private UserManager<IdentityUser> _userManager;
+
+        public BothController(IAppService service, UserManager<IdentityUser> userManager) {
             _service = service;
+            _userManager = userManager;
+        }
+
+        [Authorize]
+        [HttpGet("notification")]
+        public async Task<IActionResult> GetAllNotificationAsync () {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var email = user?.Email;
+            
+            var result = await _service.GetAllNotificationOfUser(email);
+
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
+        [Authorize]
+        [HttpPost("notification")]
+        public async Task<IActionResult> CreateUserNotification ([FromBody] NotificationModelDto notification) {
+            if (ModelState.IsValid) {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var email = user?.Email;
+
+                var notif = _mapper.Map<NotificationModel>(notification);
+
+                notif.CreatedDate = DateTime.Now;
+                notif.IsRecurring = false;
+                notif.IsRead = false;
+
+                var result = await _service.CreateUserNotification(notif, email);
+                if(result.IsSuccess) {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        [Authorize]
+        [HttpPost("follow")]
+        public async Task<IActionResult> FollowClubInterest ([FromBody] FollowModelDto clubs ) {
+            if (ModelState.IsValid) {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var email = user?.Email;
+
+                var result = await _service.FollowClubInterest(clubs.TeamIds, email);
+                if(result.IsSuccess) {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
         }
 
         [Authorize]

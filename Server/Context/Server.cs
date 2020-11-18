@@ -15,5 +15,8 @@ namespace Context
         public DbSet<Sport> Sports { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Players> Players { get; set; }
+        public DbSet<NotificationModel> NotificationModel { get; set; }
+        public DbSet<Follow> Follows { get; set; }
+        public DbSet<NotificationHubModel> NotificationHubModels {get; set;}
     }
 }
