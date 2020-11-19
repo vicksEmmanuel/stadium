@@ -25,5 +25,7 @@ namespace Models
         public virtual int? TeamId { get; set; }
         public virtual int? PlayerId {get; set; }
         
+        public dynamic? Data { get; set; }
+
     }
 }

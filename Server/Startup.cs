@@ -77,7 +77,7 @@ namespace server
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hubs/notification")))
+                            (path.StartsWithSegments("/hubs/notification") || path.StartsWithSegments("/hubs/golive")))
                         {
                             // Read the token out of the query string
                             context.Token = accessToken;
@@ -92,6 +92,7 @@ namespace server
             services.AddScoped<IAppService, AppierService>();
             services.AddScoped<IUserAuthService, UserAuthService>();
             services.AddTransient<IMailService,  SendEmail>();
+            services.AddTransient<IHandlerServices, HandlerServices>();
 
             services.AddControllers().AddNewtonsoftJson(s => {
                 s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -125,6 +126,7 @@ namespace server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationHub>("/hubs/notification");
+                endpoints.MapHub<GoLiveHub>("/hubs/golive");
                 endpoints.MapControllers();
             });
         }

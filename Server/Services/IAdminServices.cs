@@ -106,12 +106,13 @@ namespace Services
         }
 
         public async Task<UserManagerResponse> GoLive(int teamId, string adminEmail, HttpRequest request) {
-            if(!CheckIfAdmin(adminEmail)) {
+            var isAdmin = _dbContext.Users.FirstOrDefault(e => e.Email.ToLower() == adminEmail.ToLower());
+            if(isAdmin == null) 
                 return new UserManagerResponse {
                     Message = "Not an Admin",
                     IsSuccess = false
                 };
-            }
+            
             var team = _dbContext.Teams.FirstOrDefault(x => x.Id == teamId);
             if(team == null) {
                 return new UserManagerResponse {
@@ -120,6 +121,7 @@ namespace Services
                 };
             }
             var usersWhoFollowsTeam = _dbContext.Follows.Where(x => x.TeamId == team.Id).ToArray();
+            var sport = _dbContext.Sports.FirstOrDefault(x => x.Id == team.SportId);
             foreach(var user in usersWhoFollowsTeam) {
                 var model = new NotificationModel() {
                     Message = $"{team.Name} is now live at {DateTime.Now.TimeOfDay.ToString()}",
@@ -128,7 +130,12 @@ namespace Services
                     IsRead = false,
                     UserId = user.Id,
                     IsRecurring = false,
-                    TeamId = teamId
+                    TeamId = teamId,
+                    Data = new GoLiveDto() {
+                        AdminTeamGroup = $"{sport.Name}_{team.Name}_admin",
+                        UserChatTeamGroup = $"{sport.Name}_{team.Name}_users_chat",
+                        UserTeamGroup = $"{sport.Name}_{team.Name}_users"
+                    }
                 };
                 var message = JsonConvert.SerializeObject(model);
                 var registeredNotification = _dbContext.NotificationHubModels
@@ -143,7 +150,21 @@ namespace Services
 
             return new UserManagerResponse {
                 Message = "Gone live",
-                IsSuccess = true
+                IsSuccess = true,
+                Data = new NotificationModel() {
+                    Message = $"{team.Name} is now live at {DateTime.Now.TimeOfDay.ToString()}",
+                    Type = "GO_LIVE",
+                    CreatedDate = DateTime.Now,
+                    IsRead = false,
+                    UserId = isAdmin.Id,
+                    IsRecurring = false,
+                    TeamId = teamId,
+                    Data = new GoLiveDto() {
+                        AdminTeamGroup = $"{sport.Name}_{team.Name}_admin",
+                        UserChatTeamGroup = $"{sport.Name}_{team.Name}_users_chat",
+                        UserTeamGroup = $"{sport.Name}_{team.Name}_users"
+                    }
+                }
             };
 
         }

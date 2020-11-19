@@ -33,6 +33,9 @@ namespace Models
         public virtual int? PlayerId {get; set; }
         [ForeignKey("PlayerId")]     
         public virtual Players Player{ get; set; }
+
+        [NotMapped]
+        public dynamic? Data { get; set; }
         
     }
 }
