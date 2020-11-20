@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "availity-reactstrap-validation": "^2.7.0",
+    "reactstrap": "^8.7.1"
+  }
+}
