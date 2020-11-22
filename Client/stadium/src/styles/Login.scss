@@ -34,6 +34,12 @@
     z-index: 10;
     height: 20px;
     border-radius: 50%;
+    background-color: gray;
+  }
+  .error-field {
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #dc3545;
   }
 
   .team1 {
@@ -79,6 +85,32 @@
     width: 90px;
     height: 44px;
     margin: 30px;
+  }
+
+  .form-label {
+    font-weight: bolder;
+    font-size: 12px;
+    letter-spacing: 3px;
+    font-family: 'Roboto';
+  }
+
+  .link-ext {
+    font-family: 'Roboto';
+    font-size: 10px;
+    font-weight: bold;
+    color: gray;
+  }
+
+  .link {
+    font-size: 10px;
+    font-weight: bold;
+    font-family: 'Roboto';
+    color: blueviolet;
+  }
+  .error-field {
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
   }
 
   @media only screen and (min-width: 600px) {

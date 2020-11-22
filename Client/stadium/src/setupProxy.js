@@ -1,9 +1,9 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 module.exports = function(app) {
   app.use(
-    '/v3/transactions',
+    'admin/auth/signin',
     createProxyMiddleware({
-      target: 'https://api.flutterwave.com',
+      target: 'http://localhost:5000/',
       secure: false,
       changeOrigin: true,
     })

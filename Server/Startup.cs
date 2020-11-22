@@ -44,7 +44,6 @@ namespace server
                 (Configuration.GetConnectionString("StadiumConnection")));
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
             services.AddCors();
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => {
@@ -108,6 +107,14 @@ namespace server
                 .AllowAnyMethod()
                 .AllowCredentials()
            );
+           DotNetEnv.Env.Load(".env");
+           Console.WriteLine(DotNetEnv.Env.GetString("DEV_HOST"));
+           app.UseCors(builder => {
+                builder.WithOrigins(DotNetEnv.Env.GetString("DEV_HOST"))
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+            });
 
             if (env.IsDevelopment())
             {

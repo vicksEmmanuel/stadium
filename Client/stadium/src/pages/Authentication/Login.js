@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import { withRouter, Link } from 'react-router-dom';
-import { Row, Col, CardBody, Card, Alert,Container } from "reactstrap";
-import { AvForm, AvField } from 'availity-reactstrap-validation';
-import "../../styles/Login.css";
+import { Row, Col, CardBody, Card, Alert,Container, Label } from "reactstrap";
+import { AvForm, AvField, AvGroup, AvInput, AvFeedback, AvRadioGroup, AvRadio, AvCheckboxGroup, AvCheckbox } from 'availity-reactstrap-validation';
+import "../../styles/Login.scss";
 import logo from "../../assets/Images/stadium logo neon.png";
 import team1 from "../../assets/Images/team1.png";
 import team2 from "../../assets/Images/team2.png";
@@ -11,18 +11,69 @@ import team3 from "../../assets/Images/team3.png";
 import team4 from "../../assets/Images/team4.png";
 import team5 from "../../assets/Images/team5.png";
 import stadium from "../../assets/Images/stadium.png";
+import instance from '../../helpers/axiosly';
+import { configParams } from '../../config';
 
  const Login = (props) => {
     const [state, setState] = useState({
-        loading: false
+        loading: false,
+        error: {
+            email: 'Email is required',
+            password: 'Password is required',
+            watch: {
+                email: '',
+                password: ''
+            }
+        },
+        email: '',
+        password: ''
     });
+
+    const form = useRef();
+    
     const stateSetting = (newState, key) => {
         const temp = {...state};
         temp[`${key}`] = newState;
         setState(temp);
     }
     // handleValidSubmit
-  function  handleValidSubmit(event, values) {}
+  function  handleValidSubmit(event, values) {
+    event.preventDefault();
+    instance.post(`admin/auth/signin`,values).then(data => {
+        if (!data.data.isSuccess) {
+            change();
+            return;
+        }
+
+        if (String(data.data.data.userType).toLocaleLowerCase() != 'admin')  {
+            change();
+            return;
+        }
+
+        localStorage.setItem("stadium--xx-xx-xx-10/20/20--authUser", JSON.stringify(data.data));
+        localStorage.setItem("stadiumJWToken", JSON.stringify({
+            bearer : `Bearer ${data.data.message}`,
+            date: new Date(data.data.expirationDate)
+        }));
+
+        props.history.push("/home");
+    }).catch(e => {
+       change();
+    })
+  }
+
+  const change =() => {
+    setState({
+        ...state,
+        error: {
+            ...state.error,
+            watch: {
+                email: "Provide an admin email",
+                password: "Provide an admin password"
+            }
+        }
+    });
+  }
     return (
         <React.Fragment>            
             <div>
@@ -57,27 +108,67 @@ import stadium from "../../assets/Images/stadium.png";
                                             <CardBody className="pt-0 border-0">
                                                 <div className="p-2">
 
-                                                    <AvForm className="form-horizontal" onValidSubmit={(e,v) => { handleValidSubmit(e,v) }}>
+                                                    <AvForm ref={form} className="form-horizontal" onValidSubmit={(e,v) => { handleValidSubmit(e,v) }}>
+                                                        <AvGroup>
+                                                            <Label className="form-label" for="email">EMAIL</Label>
+                                                            <AvInput 
+                                                                onChange={e =>
+                                                                    setState({
+                                                                    ...state, 
+                                                                    email: e.target.value,
+                                                                    error: {
+                                                                        ...state.error,
+                                                                        watch: {
+                                                                            ...state.error.watch,
+                                                                            email: ''
+                                                                        }
+                                                                    }
+                                                                })} 
+                                                                name="email" 
+                                                                id="email" 
+                                                                required 
+                                                                type="email"
+                                                            />
+                                                            <AvFeedback><i className="error-field">{state.error.email}</i></AvFeedback>
+                                                            <i className="error-field">{state.error.watch.email}</i>
+                                                        </AvGroup>
 
-                                                        {props.error && props.error ? <Alert color="danger">{props.error}</Alert> : null}
+                                                        <AvGroup>
+                                                            <Label className="form-label" for="password">PASSWORD</Label>
+                                                            <AvInput 
+                                                                onChange={e => 
+                                                                    setState({
+                                                                        ...state, 
+                                                                        password: e.target.value,
+                                                                        error: {
+                                                                            ...state.error,
+                                                                            watch: {
+                                                                                ...state.error.watch,
+                                                                                password: ''
+                                                                            }
+                                                                        }
+                                                                    })
+                                                                } 
+                                                                name="password" 
+                                                                id="password" 
+                                                                required 
+                                                                type="password"
+                                                            />
+                                                            <AvFeedback><i className="error-field">{state.error.password}</i></AvFeedback>
+                                                            <i className="error-field">{state.error.watch.password}</i>
+                                                        </AvGroup>
 
-                                                        <div className="form-group">
-                                                            <AvField name="email" label="EMAIL" value="" className="form-control" placeholder="Enter email" type="email" required />
-                                                        </div>
-
-                                                        <div className="form-group">
-                                                            <AvField name="password" label="PASSWORD" value="" type="password" required placeholder="Enter Password" />
-                                                        </div>
                                                         <div className="mt-4">
-                                                            <Link to="/forgot-password" className="text-muted"><i className="mdi mdi-lock mr-1"></i> Forgot your password?</Link>
+                                                            <Link to="/forgot-password" className="text-muted text-primary link"><i className="mdi mdi-lock mr-1"></i> Forgot your password?</Link>
                                                         </div>
                                                         <div className="mt-3">
-                                                            <button disabled={state.loading} className="btn btn-primary btn-block waves-effect waves-light btn-dark" type="submit">
+                                                            <button
+                                                                disabled={state.loading} className="btn btn-primary btn-block waves-effect waves-light btn-dark" type="submit">
                                                                 Login
                                                             </button>
                                                         </div>
-                                                        <div className="mt-4">
-                                                            Need an account?<Link to="/register" className="text-muted"><i className="mdi mdi-lock mr-1"></i> Register</Link>
+                                                        <div className="mt-4 link-ext">
+                                                            Need an account?<Link to="/register" className="text-muted link"><i className="mdi mdi-lock mr-1"></i> Register</Link>
                                                         </div>
                                                     </AvForm>
                                                 </div>
