@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions; 
 using System.Threading.Tasks;
 using AutoMapper;
 using Context;
@@ -69,6 +70,24 @@ namespace Services
         {
             if (model == null)
                 throw new NullReferenceException("Register Model is null");
+            
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user != null ) {
+                return new UserManagerResponse {
+                    Message = "There is a user with this Email Address",
+                    IsSuccess = false
+                };
+            }
+
+            string pattern = @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
+            Regex rg = new Regex(pattern);
+            if (!rg.IsMatch(model.Password)) {
+                return new UserManagerResponse {
+                    Message = "Passwords must have at least one non alphanumeric character",
+                    IsSuccess = false
+                };
+            }
             
             var identityUser = new IdentityUser{
                 Email = model.Email,

@@ -23,7 +23,7 @@ namespace Controllers {
                     return Ok(result);
                 }
 
-                return BadRequest(result);
+                return Ok(result);
             }
 
             return BadRequest("Some properties are not valid"); //Status code 400

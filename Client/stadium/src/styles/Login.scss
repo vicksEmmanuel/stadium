@@ -41,6 +41,19 @@
     font-size: 80%;
     color: #dc3545;
   }
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: cornflowerblue;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-container {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 
   .team1 {
     position: absolute;
@@ -80,6 +93,21 @@
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
   }
+  .stadium-create {
+    height: 510px;
+  }
+  .avatar-icon {
+    width: 30px;
+    height: 30px;
+    fill: white;
+    opacity: 0.9;
+    position: relative;
+    left: 30%;
+    top: 20%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+  }
 
   .logo {
     width: 90px;
@@ -115,9 +143,6 @@
 
   @media only screen and (min-width: 600px) {
     .stadium {
-      width: 100%; 
-      height: 500px; 
-      margin: 0;
       border-radius: 0%;
       border-top-right-radius: 20px;
       border-bottom-right-radius: 20px;
@@ -126,8 +151,6 @@
 
   @media only screen and (min-width: 768px) {
     .stadium {
-      width: 100%; 
-      height: 500px; 
       margin: 0;
       border-radius: 0%;
       border-top-right-radius: 20px;

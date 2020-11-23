@@ -3,22 +3,13 @@ import { Switch, BrowserRouter as Router,Route } from "react-router-dom";
 
 import { userRoutes , authRoutes } from "./routes/allRoutes";
 import Authmiddleware from "./routes/middleware/Authmiddleware";
+import NonAuthmiddleware from "./routes/middleware/NonAuthMiddleware";
 
 // import logo from './logo.svg';
 import './App.css';
 // import TestingSpeech from './components/TestingSpeech';
 
 function App() {
-  
-  const NonAuthmiddleware = ({
-    component: Component,
-  }) => (
-      <Route
-        render={props => {
-        return <Component {...props} />;
-        }}
-      />
-    );
 
 
   return (
