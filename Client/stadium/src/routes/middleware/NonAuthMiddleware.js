@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Route,Redirect,withRouter } from "react-router-dom";
 
 const NonAuthmiddleware = ({
-	component: Component
+	component: Component,
+	layout: Layout
 }) => {
 	return (
 		<Route
@@ -16,7 +17,9 @@ const NonAuthmiddleware = ({
                         );
 				}
 
-				return <Component {...props} />;
+				return <Layout>
+					<Component {...props} />
+				</Layout>;
 			}}
 		/>
 	);

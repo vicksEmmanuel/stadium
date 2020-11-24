@@ -4,9 +4,10 @@ import { Switch, BrowserRouter as Router,Route } from "react-router-dom";
 import { userRoutes , authRoutes } from "./routes/allRoutes";
 import Authmiddleware from "./routes/middleware/Authmiddleware";
 import NonAuthmiddleware from "./routes/middleware/NonAuthMiddleware";
+import NonAuthLayout from "./components/NonAuthLayout";
+import Layout from "./components/Layout";
 
-// import logo from './logo.svg';
-import './App.css';
+import "./assets/scss/theme.scss";
 // import TestingSpeech from './components/TestingSpeech';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
 									path={route.path}
 									component={route.component}
 									key={idx}
+									layout={NonAuthLayout}
 								/>
 							))}
 
@@ -29,6 +31,7 @@ function App() {
 									path={route.path}
 									component={route.component}
 									key={idx}
+									layout={Layout}
 								/>
 							))}
 

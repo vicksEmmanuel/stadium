@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Route,Redirect,withRouter } from "react-router-dom";
 
 const Authmiddleware = ({
-	component: Component
+	component: Component,
+	layout: Layout
 }) => {
 	return (
 		<Route
@@ -15,7 +16,9 @@ const Authmiddleware = ({
 					);
 				}
 
-				return <Component {...props} />;
+				return <Layout>
+					<Component {...props} />
+				</Layout>;
 			}}
 		/>
 	);
