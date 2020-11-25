@@ -64,16 +64,29 @@ class Layout extends Component {
 
       if(this.state.isMobile)
         this.toogleMenuCallback();
-
+      
+      window.addEventListener("resize", () => {
+        this.setState({
+          isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        });
+        this.toogleMenuCallback();
+      });
   }
 
 
   toogleMenuCallback = () => {
     this.layoutProps._toggleLeftmenu(!this.layoutProps.state.leftMenu);
-    if (this.layoutProps.state.leftSideBarType === "default") {
+    if (this.state.isMobile != true) {
+      this.layoutProps.changeLeftSidebarType({ payload: { sidebarType: "default", isMobile: this.layoutProps.state.leftMenu}});
+      this.layoutProps._changeSidebarType("default", this.layoutProps.state.leftMenu);
+    } else {
       this.layoutProps._changeSidebarType("condensed", this.layoutProps.state.leftMenu);
       this.layoutProps.changeLeftSidebarType({ payload: { sidebarType: "condensed", isMobile: this.layoutProps.state.leftMenu}});
-    }
+      if (document.body) {
+        document.body.classList.add('sidebar-enable');
+        document.body.classList.add('vertical-collpsed');
+      } 
+    } 
   }
 
   render() {
