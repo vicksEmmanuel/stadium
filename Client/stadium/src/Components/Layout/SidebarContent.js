@@ -72,12 +72,19 @@ const SidebarContent = (props) => {
                             <span>{props.t('Home') }</span>
                         </Link>
                      </li>
-                     
                      <li>
-                        <Link to="/articles" className="waves-effect">
+                         <Link to="/#" className="has-arrow waves-effect">
                             <i className="bx bx-detail"></i>
-                            <span>{props.t('Articles') }</span>
+                            <span>{props.t('Football') }</span>
                         </Link>
+                        <ul className="sub-menu" aria-expanded="false">
+                            <li>
+                                <Link to="/football-competitions" className="waves-effect">{props.t('Competitions') }</Link>
+                            </li>
+                            <li>
+                                <Link to="/football-teams" className="waves-effect">{props.t('Teams') }</Link>
+                            </li>
+                        </ul>
                      </li>
 
                      <li>
