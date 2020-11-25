@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "./home.scss";
 import _ from 'lodash';
 import { Container, Row, Col, Button, Card, CardBody, CardTitle, Modal, ModalHeader, ModalBody, ModalFooter, Media, Table } from "reactstrap";
 import Breadcrumbs from '../../components/Common/Breadcrumb';

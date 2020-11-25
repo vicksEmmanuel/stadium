@@ -1,0 +1,22 @@
+@import "../../assets/scss/theme.scss";
+
+.apexcharts-canvas {
+    text {
+        fill: $text-muted !important;
+    }
+}
+
+.avatar-icon {
+    width: 30px;
+    height: 30px;
+    fill: white;
+    opacity: 0.9;
+    position: relative;
+  }
+.margin-bottom-20 {
+    margin-bottom: 20px;
+}
+.error-field {
+    font-size: 10px;
+    font-weight: 400;
+}
