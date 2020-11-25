@@ -1,31 +1,21 @@
 import React, { Component } from "react";
 
 import { withRouter } from "react-router-dom";
+import stateWrapper from "../../containers/provider";
 
 // Layout Related Components
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
-
-const initLayoutValue = {
-	layoutType: "vertical",
-	layoutWidth: "fluid",
-	leftSideBarTheme: "dark",
-	leftSideBarType: "default",
-	topbarTheme: "light",
-	isPreloader: false,
-	showRightSidebar: false,
-	isMobile: false,
-	showSidebar : true,
-	leftMenu : true
-}
+import Header from "./Header";
 
 class Layout extends Component {
   constructor(props) {
     super(props);
+    console.log(props);
+    this.layoutProps = props.layoutStore;
     this.state = {
       isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     };
-    this.toggleMenuCallback = this.toggleMenuCallback.bind(this);
   }
 
   capitalizeFirstLetter = string => {
@@ -34,7 +24,7 @@ class Layout extends Component {
 
   componentDidMount() {
 
-    if (initLayoutValue.isPreloader === true) {
+    if (this.layoutProps.state.isPreloader === true) {
       document.getElementById('preloader').style.display = "block";
       document.getElementById('status').style.display = "block";
 
@@ -57,18 +47,37 @@ class Layout extends Component {
     document.title =
       currentage + " | Stadium";
 
+      if (this.layoutProps.state.leftSideBarTheme) {
+        this.layoutProps._changeSidebarTheme(this.layoutProps.state.leftSideBarTheme);
+      }
+  
+      if (this.layoutProps.state.layoutWidth) {
+        this.layoutProps._changeLayoutWidth(this.layoutProps.state.layoutWidth);
+      }
+  
+      if (this.layoutProps.state.leftSideBarType) {
+        this.layoutProps._changeSidebarType(this.layoutProps.state.leftSideBarType);
+      }
+      if (this.layoutProps.state.topbarTheme) {
+        this.layoutProps._changeTopbarTheme(this.layoutProps.state.topbarTheme);
+      }
+
+      if(this.state.isMobile)
+        this.toogleMenuCallback();
+
   }
-  toggleMenuCallback = () => {
-    if (initLayoutValue.leftSideBarType === "default") {
-      initLayoutValue.leftSideBarType = "default";
-      initLayoutValue.isMobile = this.state.isMobile;
-    } else if (this.props.leftSideBarType === "condensed") {
-      initLayoutValue.leftSideBarType = "condensed";
-      initLayoutValue.isMobile = this.state.isMobile;
+
+
+  toogleMenuCallback = () => {
+    this.layoutProps._toggleLeftmenu(!this.layoutProps.state.leftMenu);
+    if (this.layoutProps.state.leftSideBarType === "default") {
+      this.layoutProps._changeSidebarType("condensed", this.layoutProps.state.leftMenu);
+      this.layoutProps.changeLeftSidebarType({ payload: { sidebarType: "condensed", isMobile: this.layoutProps.state.leftMenu}});
     }
-  };
+  }
 
   render() {
+    
     return (
       <React.Fragment>
         <div id="preloader">
@@ -85,8 +94,9 @@ class Layout extends Component {
         </div>
 
         <div id="layout-wrapper">
-          <Sidebar theme={initLayoutValue.leftSideBarTheme}
-            type={initLayoutValue.leftSideBarType}
+          <Header/>
+          <Sidebar theme={this.layoutProps.state.leftSideBarTheme}
+            type={this.layoutProps.state.leftSideBarType}
             isMobile={this.state.isMobile} />
           <div className="main-content">
             {this.props.children}
@@ -98,4 +108,4 @@ class Layout extends Component {
   }
 }
 
-export default withRouter(Layout);
+export default withRouter(stateWrapper(Layout));

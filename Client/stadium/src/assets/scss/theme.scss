@@ -2,16 +2,16 @@
 @import "./icons.scss";
 
 // Dark Theme
-@import "./bootstrap-dark.scss";
-@import "./app-dark.scss";
+// @import "./bootstrap-dark.scss";
+// @import "./app-dark.scss";
 
 // RTL Mode
 // @import "./bootstrap.scss";
 // @import "./app-rtl.scss";
 
 // Light Theme
-// @import "./bootstrap.scss";
-// @import "./app.scss";
+@import "./bootstrap.scss";
+@import "./app.scss";
 
 #sidebar-menu {
     ul {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { connect } from "react-redux";
 import { Row, Col } from "reactstrap";
 
 import { Link } from "react-router-dom";
@@ -9,7 +8,6 @@ import { Link } from "react-router-dom";
 import { Dropdown, DropdownToggle, DropdownMenu } from "reactstrap";
 
 // Import menuDropdown
-import LanguageDropdown from "../CommonForBoth/TopbarDropdown/LanguageDropdown";
 import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDropdown";
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu";
 
@@ -29,9 +27,7 @@ import slack from "../../assets/images/brands/slack.png";
 
 //i18n
 import { withTranslation } from 'react-i18next';
-
-// Redux Store
-import {  showRightSidebarAction,toggleLeftmenu,changeSidebarType } from "../../store/actions";
+import stateWrapper from '../../containers/provider';
 
 
 const Header = (props) => {
@@ -72,11 +68,13 @@ const Header = (props) => {
 
 function tToggle()
 {
-       props.toggleLeftmenu(!props.leftMenu);
-      if (props.leftSideBarType === "default") {
-         props.changeSidebarType("condensed", isMobile);
-    } else if (props.leftSideBarType === "condensed") {
-         props.changeSidebarType("default", isMobile);
+    props.layoutStore._toggleLeftmenu(!props.layoutStore.state.leftMenu);
+    if (props.layoutStore.state.leftSideBarType === "default") {
+        props.layoutStore._changeSidebarType("condensed", props.layoutStore.state.leftMenu);
+        props.layoutStore.changeLeftSidebarType({ payload: { sidebarType: "condensed", isMobile: props.layoutStore.state.leftMenu}});
+    } else if (props.layoutStore.state.leftSideBarType === "condensed") {
+      props.layoutStore.changeLeftSidebarType({ payload: { sidebarType: "default", isMobile: props.layoutStore.state.leftMenu}});
+      props.layoutStore._changeSidebarType("default", props.layoutStore.state.leftMenu);
     }  
 }
       return (
@@ -107,13 +105,6 @@ function tToggle()
               <button type="button" onClick={() => {   tToggle() }} className="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
                 <i className="fa fa-fw fa-bars"></i>
               </button>
-
-              <form className="app-search d-none d-lg-block">
-                <div className="position-relative">
-                  <input type="text" className="form-control" placeholder={props.t('Search') + "..."} />
-                  <span className="bx bx-search-alt"></span>
-                </div>
-              </form>
 
               <Dropdown className="dropdown-mega d-none d-lg-block ml-2" isOpen={megaMenu} toggle={() => { setmegaMenu(!megaMenu) }}>
                 <DropdownToggle className="btn header-item waves-effect" caret tag="button"> {props.t('Mega Menu')} {" "}
@@ -268,8 +259,6 @@ function tToggle()
                 </div>
               </div>
 
-              <LanguageDropdown />
-
               <Dropdown className="d-none d-lg-inline-block ml-1" isOpen={socialDrp} toggle={() => { setsocialDrp(!socialDrp); }}>
                 <DropdownToggle className="btn header-item noti-icon waves-effect" tag="button">
                   <i className="bx bx-customize"></i>
@@ -330,12 +319,6 @@ function tToggle()
               <NotificationDropdown />
               <ProfileMenu />
 
-              <div onClick={() => { props.showRightSidebarAction(!props.showRightSidebar); }} className="dropdown d-inline-block">
-                <button type="button" className="btn header-item noti-icon right-bar-toggle waves-effect">
-                  <i className="bx bx-cog bx-spin"></i>
-                </button>
-              </div>
-
             </div>
           </div>
         </header>
@@ -343,4 +326,4 @@ function tToggle()
       );
     }
 
-export default withTranslation()(Header);
+export default withTranslation()(stateWrapper(Header));
