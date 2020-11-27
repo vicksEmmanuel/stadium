@@ -74,7 +74,7 @@ const SidebarContent = (props) => {
                      </li>
                      <li>
                          <Link to="/#" className="has-arrow waves-effect">
-                            <i className="bx bx-detail"></i>
+                            <i className="bx bx-football"></i>
                             <span>{props.t('Football') }</span>
                         </Link>
                         <ul className="sub-menu" aria-expanded="false">

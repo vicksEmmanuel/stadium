@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Container, Row, Col, Badge, Button, Card, CardBody, CardTitle, Modal, ModalHeader, ModalBody, ModalFooter, Media, Table } from "reactstrap";
 import { AvForm, AvField, AvGroup, AvInput, AvFeedback, AvRadioGroup, AvRadio, AvCheckboxGroup, AvCheckbox } from 'availity-reactstrap-validation';
 import Breadcrumbs from '../../components/Common/Breadcrumb';
 import { withRouter, Link } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 import stateWrapper from "../../containers/provider";
+import instance from '../../helpers/axiosly';
+import { configParams } from '../../config';
 import "./football.scss";
 
 const Teams = (props) => {
@@ -13,6 +16,7 @@ const Teams = (props) => {
         imageSrc: null,
         imageFile: null,
         error: 'Enter Valid Team name',
+        teams: []
     });
 
     const form = useRef();
@@ -20,30 +24,37 @@ const Teams = (props) => {
     const callImageInput = () => {
         document.getElementById("imageFile").click();
     }
+
+    const loadUpTeams = async () => {
+        if (!(props.footballStore.state.teams.length > 0)) {
+            await props.footballStore.getTeams();
+        }
+        setState({...state, teams: props.footballStore.state.teams});
+    }
+
+    useEffect(() => {
+        loadUpTeams();
+    }, [props.footballStore.state.teams]);
+
   function  handleValidSubmit(event, values) {
     event.preventDefault();
     let newValues = {
         ...values,
         imageFile: state.imageFile
     }
-    console.log(newValues);
-    // let formData = new FormData();
-    // formData.append("username", newValues.username);
-    // formData.append("email", newValues.email);
-    // formData.append("password", newValues.password);
-    // formData.append("userType", newValues.userType);
-    // formData.append("userFile", newValues.userFile);
-    // instance.post(`admin/auth/`,formData).then(data => {
-    //     if (!data.data.isSuccess) {
-    //         change(data.data);
-    //         return;
-    //     }
 
-    //     props.history.push("/login");
-    // }).catch(e => {
-    //     console.log(e);
-    //    change();
-    // })
+    let formData = new FormData();
+    formData.append("name", newValues.teams);
+    formData.append("imageFile", newValues.imageFile);
+    formData.append("sportId", 1);
+    instance.post(`admin/controls/create/team/`,formData).then(data => {
+        if (data.data.isSuccess) {
+            props.footballStore.setTeam(data.data.data)
+            return;
+        }
+    }).catch(e => {
+        console.log(e);
+    })
   }
   const showPreviewAndSetValue = (e) => {
     if(e.target.files && e.target.files[0]) {
@@ -193,7 +204,43 @@ const Teams = (props) => {
                         <Col lg={9} sm={11}>
                             <Card>
                                 <CardBody>
-
+                                    {state.teams.map((team, id) => (
+                                        <div  key={id} style={{width: '20%', overflow: 'hidden', display: 'inline-block'}}>
+                                        <div 
+                                                    style={{height: 100, width: '100%'}}
+                                                    align="center"
+                                                >
+                                                    <div 
+                                                        align="center" 
+                                                        style={{
+                                                            backgroundImage: `url(${state.imageSrc != null ? state.imageSrc : null})`,
+                                                            backgroundSize: 'cover',
+                                                            backgroundRepeat: 'no-repeat'
+                                                        }}
+                                                        className="margin-bottom-20 mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center"
+                                                    >
+                                                        <span className="rounded-circle">
+                                                            <LazyLoadImage
+                                                                alt={team.name}
+                                                                className="rounded-circle"
+                                                                src={team.imageName}
+                                                                width={"100%"}
+                                                                height={"100%"}
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                    <div style={{
+                                                            border: 0,
+                                                            fontWeight: 400,
+                                                            fontSize: 12,
+                                                            textAlign: 'center',
+                                                        }}
+                                                    >
+                                                        {team.name}
+                                                    </div>
+                                                </div>
+                                    </div>
+                                    ))}
                                 </CardBody>
                             </Card>
                         </Col>

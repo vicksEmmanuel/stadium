@@ -10,7 +10,7 @@ axio.interceptors.request.use((config) => {
     const customConfig = config;
     if (localStorage.getItem('stadiumJWToken')) {
       let webToken = JSON.parse(localStorage.getItem('stadiumJWToken'));
-      if (webToken.date < Date.now()) {
+      if (new Date(webToken.date) >= Date.now()) {
         customConfig.headers.Authorization = webToken.bearer;
       }
     }

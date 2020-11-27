@@ -25,6 +25,7 @@ namespace Services
 {
     public interface IAppService {
         Task<UserManagerResponse> GetAllTeamAsync(HttpRequest request);
+        Task<UserManagerResponse> GetTeamBySportAsync(HttpRequest request, int id);
         Task<UserManagerResponse> GetTeamAsync(HttpRequest request, int id);
 
         Task<UserManagerResponse> GetAllPlayerAsync(HttpRequest request);
@@ -166,6 +167,25 @@ namespace Services
         public async Task<UserManagerResponse> GetAllTeamAsync(HttpRequest request)
         {
             var data = await  _dbContext.Teams.Select(x => new Team() {
+                Id = x.Id,
+                Name = x.Name,
+                SportId = x.SportId,
+                ImageName = String.Format("{0}://{1}{2}/Images/Team/{3}", request.Scheme, request.Host, request.PathBase,x.ImageName)
+            })
+            .ToListAsync();
+            
+            var x  = new UserManagerResponse{
+                Message = "All Teams",
+                IsSuccess = true,
+                Data = _mapper.Map<IEnumerable<TeamDto>>(data)
+            };
+
+            return x;
+        }
+
+        public async Task<UserManagerResponse> GetTeamBySportAsync(HttpRequest request, int id)
+        {
+            var data = await  _dbContext.Teams.Where(x => x.SportId == id).Select(x => new Team() {
                 Id = x.Id,
                 Name = x.Name,
                 SportId = x.SportId,

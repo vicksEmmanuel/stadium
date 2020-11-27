@@ -186,7 +186,8 @@ namespace Services
                 await _dbContext.SaveChangesAsync();
                 return new UserManagerResponse {
                     Message = "Team created",
-                    IsSuccess = true
+                    IsSuccess = true,
+                    Data = model
                 };
             } else {
                 return new UserManagerResponse {

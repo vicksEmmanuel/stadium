@@ -96,6 +96,22 @@ namespace Controllers {
         }
 
         [Authorize]
+        [HttpGet("team/sport/{id}")]
+        public async Task<IActionResult> GetTeamBySportAsync (int id) {
+            if (ModelState.IsValid) {
+                var result = await _service.GetTeamBySportAsync(Request, id);
+
+                if(result.IsSuccess) {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        [Authorize]
         [HttpGet("members")]
         public async Task<IActionResult> GetAllMembersAsync () {
             if (ModelState.IsValid) {

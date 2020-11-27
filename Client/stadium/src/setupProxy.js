@@ -8,4 +8,20 @@ module.exports = function(app) {
       changeOrigin: true,
     })
   );
+  app.use(
+    'admin/controls/create/team',
+    createProxyMiddleware({
+      target: 'http://localhost:5000/',
+      secure: false,
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    'team/sport/',
+    createProxyMiddleware({
+      target: 'http://localhost:5000/',
+      secure: false,
+      changeOrigin: false,
+    })
+  );
 };

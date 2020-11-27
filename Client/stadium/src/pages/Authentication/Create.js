@@ -130,7 +130,7 @@ import { configParams } from '../../config';
                             <Row>
                                 <Col style={{padding: 30}} md={6} lg={4} xl={6} sm={12}>
                                         <Card className="overflow-hidden border-0">
-                                            <div className="bg-soft-primary">
+                                            <div>
                                                 <Row>
                                                     <Col className="col-12">
                                                         <div className="text-primary text-center text-dark">

@@ -17,6 +17,7 @@ class App extends Component{
 	constructor(props) {
 		super(props);
 		this.layoutStore = allStores[0];
+		this.footballStore = allStores[1];
 	}
 
 	appScreen = (layout) => 

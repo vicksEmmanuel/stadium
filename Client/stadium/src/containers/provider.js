@@ -9,9 +9,11 @@ export default WrappedComponent => {
     <Subscribe to={allStores}>
         {(
           layoutStore,
+          footballStore,
         ) => (
           <WrappedComponent
             layoutStore={layoutStore}
+            footballStore={footballStore}
             {...props}
           />
         )}
