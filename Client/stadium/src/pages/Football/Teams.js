@@ -16,7 +16,10 @@ const Teams = (props) => {
         imageSrc: null,
         imageFile: null,
         error: 'Enter Valid Team name',
-        teams: []
+        teams: [],
+        teamsCopy: [],
+        isSearch: false,
+        searchedTeam: ''
     });
 
     const form = useRef();
@@ -85,6 +88,17 @@ const Teams = (props) => {
         })
     }
   }
+
+  const searchForTeam = e => {
+      let teamsCopy = state.teams.filter(x => new RegExp(e.target.value).test(x.name));
+      setState({...state, teamsCopy, isSearch: true, searchedTeam: e.target.value});
+  }
+
+  const cancelSearch = () => {
+      setState({...state, teamsCopy: [], isSearch: false, searchedTeam: ''});
+  }
+
+  let teams = state.isSearch == true ? state.teamsCopy : state.teams;
 
     return (
         <React.Fragment>
@@ -204,42 +218,61 @@ const Teams = (props) => {
                         <Col lg={9} sm={11}>
                             <Card>
                                 <CardBody>
-                                    {state.teams.map((team, id) => (
-                                        <div  key={id} style={{width: '20%', overflow: 'hidden', display: 'inline-block'}}>
-                                        <div 
-                                                    style={{height: 100, width: '100%'}}
-                                                    align="center"
-                                                >
-                                                    <div 
-                                                        align="center" 
-                                                        style={{
-                                                            backgroundImage: `url(${state.imageSrc != null ? state.imageSrc : null})`,
-                                                            backgroundSize: 'cover',
-                                                            backgroundRepeat: 'no-repeat'
-                                                        }}
-                                                        className="margin-bottom-20 mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center"
-                                                    >
-                                                        <span className="rounded-circle">
-                                                            <LazyLoadImage
-                                                                alt={team.name}
-                                                                className="rounded-circle"
-                                                                src={team.imageName}
-                                                                width={"100%"}
-                                                                height={"100%"}
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div style={{
-                                                            border: 0,
-                                                            fontWeight: 400,
-                                                            fontSize: 12,
-                                                            textAlign: 'center',
-                                                        }}
-                                                    >
-                                                        {team.name}
-                                                    </div>
-                                                </div>
+                                    <div style={{width: '100%', marginBottom: 10}} align="right">
+                                    <AvForm className="form-horizontal" onValidSubmit={(e,v) => { e.preventDefault(); }}>
+                                        <AvGroup>
+                                            <Media>
+                                                <AvInput
+                                                    style={{
+                                                        border: 0,
+                                                        fontWeight: '400',
+                                                        fontSize: 13,
+                                                        textAlign: 'center'
+                                                    }} 
+                                                    onChange={searchForTeam}
+                                                    name="teams" 
+                                                    id="teams"
+                                                    value={state.searchedTeam}
+                                                    placeholder={"Search for team e.g. Barcelona, Manchester"}
+                                                    autoComplete={"off"}
+                                                />
+                                                <i onClick={cancelSearch} className="bx bx-window-close font-size-20"></i>
+                                            </Media>
+                                        </AvGroup>
+                                    </AvForm>
                                     </div>
+                                    {teams.map((team, id) => (
+                                        <div  key={id} style={{width: '20%', overflow: 'hidden', display: 'inline-block'}}>
+                                            <Link to={`team/${team.name}`}>
+                                                <div 
+                                                        style={{height: 100, width: '100%'}}
+                                                        align="center"
+                                                    >
+                                                        <div 
+                                                            align="center" 
+                                                            className="margin-bottom-20 mini-stat-icon avatar-sm align-self-center"
+                                                        >
+                                                            <span className="rounded-circle">
+                                                                <LazyLoadImage
+                                                                    alt={team.name}
+                                                                    src={team.imageName}
+                                                                    width={"89%"}
+                                                                    height={"100%"}
+                                                                />
+                                                            </span>
+                                                        </div>
+                                                        <div style={{
+                                                                border: 0,
+                                                                fontWeight: 400,
+                                                                fontSize: 12,
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            {team.name}
+                                                        </div>
+                                                    </div>
+                                            </Link>
+                                        </div>
                                     ))}
                                 </CardBody>
                             </Card>

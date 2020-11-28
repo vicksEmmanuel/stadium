@@ -18,6 +18,7 @@ class App extends Component{
 		super(props);
 		this.layoutStore = allStores[0];
 		this.footballStore = allStores[1];
+		this.userStore = allStores[2];
 	}
 
 	appScreen = (layout) => 

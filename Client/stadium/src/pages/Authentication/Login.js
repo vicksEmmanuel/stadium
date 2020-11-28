@@ -11,8 +11,7 @@ import team3 from "../../assets/images/team3.png";
 import team4 from "../../assets/images/team4.png";
 import team5 from "../../assets/images/team5.png";
 import stadium from "../../assets/images/stadium.png";
-import instance from '../../helpers/axiosly';
-import { configParams } from '../../config';
+import stateWrapper from '../../containers/provider';
 
  const Login = (props) => {
     const [state, setState] = useState({
@@ -30,36 +29,10 @@ import { configParams } from '../../config';
     });
 
     const form = useRef();
-    
-    const stateSetting = (newState, key) => {
-        const temp = {...state};
-        temp[`${key}`] = newState;
-        setState(temp);
-    }
     // handleValidSubmit
   function  handleValidSubmit(event, values) {
     event.preventDefault();
-    instance.post(`admin/auth/signin`,values).then(data => {
-        if (!data.data.isSuccess) {
-            change();
-            return;
-        }
-
-        if (String(data.data.data.userType).toLocaleLowerCase() != 'admin')  {
-            change();
-            return;
-        }
-
-        localStorage.setItem("stadium--xx-xx-xx-10/20/20--authUser", JSON.stringify(data.data));
-        localStorage.setItem("stadiumJWToken", JSON.stringify({
-            bearer : `Bearer ${data.data.message}`,
-            date: new Date(data.data.expirationDate)
-        }));
-
-        props.history.push("/home");
-    }).catch(e => {
-       change();
-    })
+    props.userStore.signIn(values, change, props);
   }
 
   const change =() => {
@@ -187,4 +160,4 @@ import { configParams } from '../../config';
      );
     }
 
-export default withRouter(Login)
+export default withRouter(stateWrapper(Login))

@@ -10,10 +10,12 @@ export default WrappedComponent => {
         {(
           layoutStore,
           footballStore,
+          userStore,
         ) => (
           <WrappedComponent
             layoutStore={layoutStore}
             footballStore={footballStore}
+            userStore={userStore}
             {...props}
           />
         )}
