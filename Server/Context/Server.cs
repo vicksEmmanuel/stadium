@@ -19,5 +19,7 @@ namespace Context
         public DbSet<Follow> Follows { get; set; }
         public DbSet<NotificationHubModel> NotificationHubModels {get; set;}
         public DbSet<GoLiveHubModel> GoLiveHubModels {get; set;}
+        public DbSet<Competition> Competition { get; set; }
+        public DbSet<Fixture> Fixtures { get; set; }
     }
 }

@@ -22,6 +22,33 @@ namespace Controllers {
         }
 
         [Authorize]
+        [HttpPost("create/competition/fixture")]
+        public async Task<IActionResult> CreateSportAsync ([FromBody] Fixture[] fixtures) {
+            if (ModelState.IsValid) {
+
+                var result = await _adminService.CreateCompetitionFixtures(fixtures);
+                
+                if(result.IsSuccess) {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        [Authorize]
+        [HttpPost("create/competition/")]
+        public async Task<IActionResult>  CreateCompetition([FromForm] Competition competition) {
+            if (ModelState.IsValid) {
+                var result = await _adminService.CreateCompetition(competition);
+                return Ok(result);
+            }
+            return BadRequest("Some properties are not valid");
+        }
+
+        [Authorize]
         [HttpGet("golive/{teamId}")]
         public async Task<IActionResult> GoLive(int teamId) {
             if (ModelState.IsValid) {

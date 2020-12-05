@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -30,6 +31,9 @@ namespace Services
         Task<UserManagerResponse> CreateSportAsync(Sport model, string email);
         Task<UserManagerResponse> CreateTeamMemberAsync(Players model, string email);
         Task<UserManagerResponse> GoLive(int teamId, string adminEmail, HttpRequest request);
+        Task<UserManagerResponse> CreateCompetition(Competition model);
+        Task<UserManagerResponse> CreateCompetitionFixture(Fixture model);
+        Task<UserManagerResponse> CreateCompetitionFixtures(Fixture[] model);
     }
 
     public class AdminService : IAdminService
@@ -245,6 +249,61 @@ namespace Services
                     IsSuccess = false
                 };
             }
+        }
+
+        public async Task<UserManagerResponse> CreateCompetition(Competition model)
+        {
+            if (model.ImageFile != null && model.CoverImageFile != null) {
+                model.CoverImage = await SaveImage(model.CoverImageFile, "Competition\\Cover");
+                model.ImageName = await SaveImage(model.ImageFile, "Competition\\Image");
+                _dbContext.Competition.Add(model);
+                await _dbContext.SaveChangesAsync();
+                return new UserManagerResponse {
+                    Message = "Competition Created",
+                    IsSuccess = true,
+                    Data = model
+                };
+            } else {
+                return new UserManagerResponse {
+                    Message = "Add an Image and Cover Image",
+                    IsSuccess = false
+                };
+            }
+        }
+
+        public async Task<UserManagerResponse> CreateCompetitionFixture(Fixture model)
+        {
+            var isCompetition = _dbContext.Competition.FirstOrDefault(e => e.Id == model.CompetitionId);
+            var isTeam1 = _dbContext.Teams.FirstOrDefault(e => e.Id == model.Team1Id);
+            var isTeam2 = _dbContext.Teams.FirstOrDefault(e => e.Id == model.Team2Id);
+            if(isCompetition == null || isTeam1 == null || isTeam2 == null) 
+                return new UserManagerResponse {
+                    Message = $"Competition returned {isCompetition}, Team 1 returned {isTeam1}, Team 2 retured {isTeam2}",
+                    IsSuccess = false,
+                    Data= model
+                };   
+
+            _dbContext.Fixtures.Add(model);
+            await _dbContext.SaveChangesAsync();
+
+            return new UserManagerResponse {
+                Message = "Fixture Added",
+                IsSuccess = true,
+                Data = model
+            };
+        }
+
+        public async Task<UserManagerResponse> CreateCompetitionFixtures(Fixture [] model) {
+            var data = new List<UserManagerResponse>();
+            foreach(var fixture in model) {
+                var result = await CreateCompetitionFixture(fixture);
+                data.Add(result);
+            }
+            return new UserManagerResponse {
+                Message = "Done.",
+                IsSuccess = true,
+                Data = data.ToArray()
+            };
         }
     }
 }

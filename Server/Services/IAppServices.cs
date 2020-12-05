@@ -37,6 +37,14 @@ namespace Services
         Task<UserManagerResponse> CreateUserNotification(NotificationModel notification, string email);
 
         Task<UserManagerResponse> FollowClubInterest(int[] club, string email);
+
+        Task<UserManagerResponse> GetAllCompetition(HttpRequest request, int sport);
+        Task<UserManagerResponse> GetCompetition(HttpRequest request, int id);
+
+        Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId);
+        Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId);
+        Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId);
+
     }
 
     public class AppierService : IAppService
@@ -293,10 +301,190 @@ namespace Services
             data.ImageName = String.Format("{0}://{1}{2}/Images/Team/{3}", request.Scheme, request.Host, request.PathBase,data.ImageName);
 
             return new UserManagerResponse{
-                Message = "Does not exist",
-                IsSuccess = false,
+                Message = "Done",
+                IsSuccess = true,
                 Data = _mapper.Map<SportDto>(data)
             };
+        }
+
+        public async Task<UserManagerResponse> GetAllCompetition(HttpRequest request, int sportId)
+        {
+            var sport = await _dbContext.Sports.FirstOrDefaultAsync(x => x.Id == sportId);
+            if(sport == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                };
+            }
+
+            var data = _dbContext.Competition.Where(x => x.SportId == sport.Id).Select(x => new CompetitionDto() {
+                Id = x.Id,
+                Name = x.Name,
+                Current = x.Current,
+                Season = x.Season,
+                SportId = x.SportId,
+                ImageName = String.Format("{0}://{1}{2}/Images/Competition/Image/{3}", request.Scheme, request.Host, request.PathBase,x.ImageName),
+                CoverImage = String.Format("{0}://{1}{2}/Images/Competition/Cover/{3}", request.Scheme, request.Host, request.PathBase,x.CoverImage)
+            });
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = $"{sport.Name} Competitions",
+                    IsSuccess = true,
+                    Data = new Competition [0]
+                };
+            }
+
+            return new UserManagerResponse{
+                Message = $"{sport.Name} Competitions",
+                IsSuccess = true,
+                Data = data
+            };
+        }
+
+        public async Task<UserManagerResponse> GetCompetition(HttpRequest request, int id)
+        {
+            var data = await _dbContext.Competition.FirstOrDefaultAsync<Competition>(x => x.Id == id);
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                };
+            }
+
+            data.ImageName = String.Format("{0}://{1}{2}/Images/Competition/Image/{3}", request.Scheme, request.Host, request.PathBase,data.ImageName);
+            data.CoverImage = String.Format("{0}://{1}{2}/Images/Competition/Cover/{3}", request.Scheme, request.Host, request.PathBase,data.CoverImage);
+
+            return new UserManagerResponse{
+                Message = "Done",
+                IsSuccess = true,
+                Data = _mapper.Map<CompetitionDto>(data)
+            };
+        }
+
+        public async Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId)
+        {
+            var isCompetition = await _dbContext.Competition.FirstOrDefaultAsync(x => x.Id == competitionId);
+
+            if (isCompetition == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                };
+            }
+
+            var data = _dbContext.Fixtures.Where(x => x.CompetitionId == isCompetition.Id).Select(x => new Fixture {
+                Competition = isCompetition,
+                CompetitionId = x.CompetitionId,
+                EventTime = x.EventTime,
+                Id = x.Id,
+                Label = x.Label,
+                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
+                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1Id = x.Team1Id,
+                Team2Id = x.Team2Id,
+                Team1Score = x.Team1Score,
+                Team2Score = x.Team2Score
+            });
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = $"{isCompetition.Name} {isCompetition.Season} Competitions",
+                    IsSuccess = true,
+                    Data = new Fixture [0]
+                };
+            }
+
+            return new UserManagerResponse{
+                Message = $"{isCompetition.Name} {isCompetition.Season} Competitions",
+                IsSuccess = true,
+                Data = data
+            };
+
+
+        }
+
+        public async Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId)
+        {
+            var isCompetition = await _dbContext.Competition.FirstOrDefaultAsync(x => x.Id == competitionId);
+
+            if (isCompetition == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                };
+            }
+
+            var data = _dbContext.Fixtures.Where(x => x.EventTime.Date.CompareTo(DateTime.Now.Date) == 0 && x.Id == isCompetition.Id).Select(x => new Fixture {
+                Competition = isCompetition,
+                CompetitionId = x.CompetitionId,
+                EventTime = x.EventTime,
+                Id = x.Id,
+                Label = x.Label,
+                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
+                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1Id = x.Team1Id,
+                Team2Id = x.Team2Id,
+                Team1Score = x.Team1Score,
+                Team2Score = x.Team2Score
+            });
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = $"{isCompetition.Name} {isCompetition.Season} Competitions",
+                    IsSuccess = true,
+                    Data = new Fixture [0]
+                };
+            }
+
+            return new UserManagerResponse{
+                Message = $"{isCompetition.Name} {isCompetition.Season} Competitions",
+                IsSuccess = true,
+                Data = data
+            };
+            
+        }
+
+        public async Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId)
+        {
+            var isTeam = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
+
+            if (isTeam == null) {
+                return new UserManagerResponse{
+                    Message = "Does not exist",
+                    IsSuccess = false,
+                };
+            }
+
+            var data = _dbContext.Fixtures.Where(x => x.Team1Id == isTeam.Id || x.Team2Id == isTeam.Id).Select(x => new Fixture {
+                Competition = _dbContext.Competition.FirstOrDefault(y => y.Id == x.CompetitionId),
+                CompetitionId = x.CompetitionId,
+                EventTime = x.EventTime,
+                Id = x.Id,
+                Label = x.Label,
+                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
+                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1Id = x.Team1Id,
+                Team2Id = x.Team2Id,
+                Team1Score = x.Team1Score,
+                Team2Score = x.Team2Score
+            });
+
+            if(data == null) {
+                return new UserManagerResponse{
+                    Message = $"{isTeam.Name} fixtures",
+                    IsSuccess = true,
+                    Data = new Fixture [0]
+                };
+            }
+
+            return new UserManagerResponse{
+                Message = $"{isTeam.Name} fixtures",
+                IsSuccess = true,
+                Data = data
+            };
+            
         }
     }
 }

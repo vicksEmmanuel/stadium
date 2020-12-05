@@ -179,17 +179,37 @@ namespace Controllers {
         [Authorize]
         [HttpGet("sport/{id}")]
         public async Task<IActionResult> GetSportAsync (int id) {
-            if (ModelState.IsValid) {
-                var result = await _service.GetSportAsync(Request, id);
+            var result = await _service.GetSportAsync(Request, id);
 
-                if(result.IsSuccess) {
-                    return Ok(result);
-                }
-
-                return BadRequest(result);
+            if(result.IsSuccess) {
+                return Ok(result);
             }
 
-            return BadRequest("Some properties are not valid");
+            return BadRequest(result);
+        }
+
+        [Authorize]
+        [HttpGet("competition/{id}")]
+        public async Task<IActionResult> GetCompetitionAsync (int competitionId) {
+             var result = await _service.GetCompetition(Request, competitionId);
+
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+        
+        [Authorize]
+        [HttpGet("sport/competition/{id}")]
+        public async Task<IActionResult> GetAllCompetitionAsync (int sportId) {
+             var result = await _service.GetAllCompetition(Request, sportId);
+
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
         }
     }
 }
