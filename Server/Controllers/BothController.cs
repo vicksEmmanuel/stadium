@@ -23,6 +23,34 @@ namespace Controllers {
         }
 
         [Authorize]
+        [HttpGet("competition/fixtures/{id}")]
+        public async Task<IActionResult> GetAllFixturesOfCompetition (int id, string fixture="all") {
+            Dtos.UserManagerResponse result;
+
+            if (fixture.ToLower() == "all") {
+                result = await _service.GetFixtureBasedOnCompetition(id, Request);
+            } else {
+                result = await _service.GetFixtureBasedOnDate(id, Request);
+            }
+            
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+        [Authorize]
+        [HttpGet("competition/team/fixtures/{id}")]
+        public async Task<IActionResult> GetAllFixturesOfTeam (int id) {
+            var result = await _service.GetFixtureBasedOnTeams(id, Request);
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+
+        [Authorize]
         [HttpGet("notification")]
         public async Task<IActionResult> GetAllNotificationAsync () {
             var user = await _userManager.GetUserAsync(HttpContext.User);

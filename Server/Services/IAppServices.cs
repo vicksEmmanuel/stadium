@@ -41,9 +41,9 @@ namespace Services
         Task<UserManagerResponse> GetAllCompetition(HttpRequest request, int sport);
         Task<UserManagerResponse> GetCompetition(HttpRequest request, int id);
 
-        Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId);
-        Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId);
-        Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId);
+        Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId,  HttpRequest request);
+        Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId,  HttpRequest request);
+        Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId, HttpRequest request);
 
     }
 
@@ -363,7 +363,7 @@ namespace Services
             };
         }
 
-        public async Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId)
+        public async Task<UserManagerResponse> GetFixtureBasedOnCompetition(int competitionId, HttpRequest request)
         {
             var isCompetition = await _dbContext.Competition.FirstOrDefaultAsync(x => x.Id == competitionId);
 
@@ -380,8 +380,8 @@ namespace Services
                 EventTime = x.EventTime,
                 Id = x.Id,
                 Label = x.Label,
-                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
-                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1 = teamData(x.Team1Id, request),
+                Team2 = teamData(x.Team2Id, request),
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,
@@ -405,7 +405,7 @@ namespace Services
 
         }
 
-        public async Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId)
+        public async Task<UserManagerResponse> GetFixtureBasedOnDate(int competitionId, HttpRequest request)
         {
             var isCompetition = await _dbContext.Competition.FirstOrDefaultAsync(x => x.Id == competitionId);
 
@@ -422,8 +422,8 @@ namespace Services
                 EventTime = x.EventTime,
                 Id = x.Id,
                 Label = x.Label,
-                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
-                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1 = teamData(x.Team1Id, request),
+                Team2 = teamData(x.Team2Id, request),
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,
@@ -446,7 +446,19 @@ namespace Services
             
         }
 
-        public async Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId)
+        private Team teamData (int teamId,  HttpRequest request){
+            var team = _dbContext.Teams.FirstOrDefault(y => y.Id == teamId);
+            if (team != null)
+                return new Team{
+                    Id = team.Id,
+                    ImageName = String.Format("{0}://{1}{2}/Images/Team/{3}", request.Scheme, request.Host, request.PathBase, team.ImageName),
+                    Name = team.Name,
+                    SportId = team.SportId
+                };
+            return null;
+        }
+
+        public async Task<UserManagerResponse> GetFixtureBasedOnTeams(int teamId, HttpRequest request)
         {
             var isTeam = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
 
@@ -463,8 +475,8 @@ namespace Services
                 EventTime = x.EventTime,
                 Id = x.Id,
                 Label = x.Label,
-                Team1 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team1Id),
-                Team2 = _dbContext.Teams.FirstOrDefault(y => y.Id == x.Team2Id),
+                Team1 = teamData(x.Team1Id, request),
+                Team2 = teamData(x.Team2Id, request),
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,

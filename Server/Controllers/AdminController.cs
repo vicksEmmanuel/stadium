@@ -23,7 +23,7 @@ namespace Controllers {
 
         [Authorize]
         [HttpPost("create/competition/fixture")]
-        public async Task<IActionResult> CreateSportAsync ([FromBody] Fixture[] fixtures) {
+        public async Task<IActionResult> CreateCompetitionFixture ([FromBody] Fixture[] fixtures) {
             if (ModelState.IsValid) {
 
                 var result = await _adminService.CreateCompetitionFixtures(fixtures);
