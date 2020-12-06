@@ -15,8 +15,11 @@ namespace Dtos
         public string Season { get; set; }
         [Required]
         public bool Current { get; set; }
+        [Required]
+        public string BackgroundColor { get; set; }
+        [Required]
+        public string Color { get; set; }
         public string ImageName { get; set; }
-        public string CoverImage { get; set; }
          [Required]
         public virtual int SportId { get; set; }
     }

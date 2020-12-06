@@ -323,8 +323,9 @@ namespace Services
                 Current = x.Current,
                 Season = x.Season,
                 SportId = x.SportId,
-                ImageName = String.Format("{0}://{1}{2}/Images/Competition/Image/{3}", request.Scheme, request.Host, request.PathBase,x.ImageName),
-                CoverImage = String.Format("{0}://{1}{2}/Images/Competition/Cover/{3}", request.Scheme, request.Host, request.PathBase,x.CoverImage)
+                BackgroundColor = x.BackgroundColor,
+                Color = x.Color,
+                ImageName = String.Format("{0}://{1}{2}/Images/Competition/{3}", request.Scheme, request.Host, request.PathBase,x.ImageName)
             });
 
             if(data == null) {
@@ -354,8 +355,7 @@ namespace Services
             }
 
             data.ImageName = String.Format("{0}://{1}{2}/Images/Competition/Image/{3}", request.Scheme, request.Host, request.PathBase,data.ImageName);
-            data.CoverImage = String.Format("{0}://{1}{2}/Images/Competition/Cover/{3}", request.Scheme, request.Host, request.PathBase,data.CoverImage);
-
+            
             return new UserManagerResponse{
                 Message = "Done",
                 IsSuccess = true,

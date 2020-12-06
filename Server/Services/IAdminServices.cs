@@ -253,9 +253,8 @@ namespace Services
 
         public async Task<UserManagerResponse> CreateCompetition(Competition model)
         {
-            if (model.ImageFile != null && model.CoverImageFile != null) {
-                model.CoverImage = await SaveImage(model.CoverImageFile, "Competition\\Cover");
-                model.ImageName = await SaveImage(model.ImageFile, "Competition\\Image");
+            if (model.ImageFile != null) {
+                model.ImageName = await SaveImage(model.ImageFile, "Competition");
                 _dbContext.Competition.Add(model);
                 await _dbContext.SaveChangesAsync();
                 return new UserManagerResponse {
