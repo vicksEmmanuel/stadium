@@ -18,11 +18,13 @@ namespace Models
 
         [Required]
         public virtual int Team1Id { get; set; }   
-        [ForeignKey("Team1Id")]     
-        public virtual Team Team1 { get; set; }
 
         [Required]
-        public virtual int Team2Id { get; set; }   
+        public virtual int Team2Id { get; set; } 
+
+        [ForeignKey("Team1Id")]     
+        public virtual Team Team1 { get; set; }
+          
         [ForeignKey("Team2Id")]     
         public virtual Team Team2{ get; set; }
 

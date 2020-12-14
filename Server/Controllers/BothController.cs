@@ -23,6 +23,18 @@ namespace Controllers {
         }
 
         [Authorize]
+        [HttpGet("competition/{competitionId}")]
+        public async Task<IActionResult> GetCompetitionAsync (int competitionId) {
+             var result = await _service.GetCompetition(Request, competitionId);
+
+            if(result.IsSuccess) {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
+        [Authorize]
         [HttpGet("competition/fixtures/{id}")]
         public async Task<IActionResult> GetAllFixturesOfCompetition (int id, string fixture="all") {
             Dtos.UserManagerResponse result;
@@ -215,23 +227,11 @@ namespace Controllers {
 
             return BadRequest(result);
         }
-
-        [Authorize]
-        [HttpGet("competition/{id}")]
-        public async Task<IActionResult> GetCompetitionAsync (int competitionId) {
-             var result = await _service.GetCompetition(Request, competitionId);
-
-            if(result.IsSuccess) {
-                return Ok(result);
-            }
-
-            return BadRequest(result);
-        }
         
         [Authorize]
-        [HttpGet("sport/competition/{id}")]
-        public async Task<IActionResult> GetAllCompetitionAsync (int sportId) {
-             var result = await _service.GetAllCompetition(Request, sportId);
+        [HttpGet("sport/competition/{sportid}")]
+        public async Task<IActionResult> GetAllCompetitionAsync (int sportid) {
+             var result = await _service.GetAllCompetition(Request, sportid);
 
             if(result.IsSuccess) {
                 return Ok(result);

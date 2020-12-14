@@ -31,9 +31,9 @@ namespace Services
         Task<UserManagerResponse> CreateSportAsync(Sport model, string email);
         Task<UserManagerResponse> CreateTeamMemberAsync(Players model, string email);
         Task<UserManagerResponse> GoLive(int teamId, string adminEmail, HttpRequest request);
-        Task<UserManagerResponse> CreateCompetition(Competition model);
+        Task<UserManagerResponse> CreateCompetition(Competition model, string email, HttpRequest request);
         Task<UserManagerResponse> CreateCompetitionFixture(Fixture model);
-        Task<UserManagerResponse> CreateCompetitionFixtures(Fixture[] model);
+        Task<UserManagerResponse> CreateCompetitionFixtures(Fixture[] model, string email);
     }
 
     public class AdminService : IAdminService
@@ -251,12 +251,21 @@ namespace Services
             }
         }
 
-        public async Task<UserManagerResponse> CreateCompetition(Competition model)
+        public async Task<UserManagerResponse> CreateCompetition(Competition model, string email, HttpRequest request)
         {
+            if(!CheckIfAdmin(email)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
+            
             if (model.ImageFile != null) {
                 model.ImageName = await SaveImage(model.ImageFile, "Competition");
                 _dbContext.Competition.Add(model);
                 await _dbContext.SaveChangesAsync();
+                model.ImageName = String.Format("{0}://{1}{2}/Images/Competition/{3}", request.Scheme, request.Host, request.PathBase,model.ImageName);
+
                 return new UserManagerResponse {
                     Message = "Competition Created",
                     IsSuccess = true,
@@ -292,7 +301,14 @@ namespace Services
             };
         }
 
-        public async Task<UserManagerResponse> CreateCompetitionFixtures(Fixture [] model) {
+        public async Task<UserManagerResponse> CreateCompetitionFixtures(Fixture [] model, string email) {
+            if(!CheckIfAdmin(email)) {
+                return new UserManagerResponse {
+                    Message = "Not an Admin",
+                    IsSuccess = false
+                };
+            }
+
             var data = new List<UserManagerResponse>();
             foreach(var fixture in model) {
                 var result = await CreateCompetitionFixture(fixture);

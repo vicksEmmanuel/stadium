@@ -8,6 +8,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 import stateWrapper from "../../containers/provider";
 import instance from '../../helpers/axiosly';
+import CONSTANTS from '../../App.constant';
 import { configParams } from '../../config';
 import "./football.scss";
 
@@ -46,10 +47,15 @@ const Teams = (props) => {
         imageFile: state.imageFile
     }
 
+    if (state.imageSrc == null) {
+        alert('Add Team Logo');
+        return;
+    }
+
     let formData = new FormData();
     formData.append("name", newValues.teams);
     formData.append("imageFile", newValues.imageFile);
-    formData.append("sportId", 1);
+    formData.append("sportId", CONSTANTS.SPORTS.Football);
     instance.post(`admin/controls/create/team/`,formData).then(data => {
         if (data.data.isSuccess) {
             props.footballStore.setTeam(data.data.data)

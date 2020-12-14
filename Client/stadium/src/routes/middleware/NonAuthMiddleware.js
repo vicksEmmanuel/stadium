@@ -3,10 +3,12 @@ import { Route,Redirect,withRouter } from "react-router-dom";
 
 const NonAuthmiddleware = ({
 	component: Component,
-	layout: Layout
+	layout: Layout,
+	path
 }) => {
 	return (
 		<Route
+			path={path}
 			render={props => {
 			let user = localStorage.getItem("stadium--xx-xx-xx-10/20/20--authUser");
 			// here you can apply condition

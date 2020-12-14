@@ -4,14 +4,17 @@ import { Redirect } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Authentication/Login";
 import Create from "../pages/Authentication/Create";
-import Competiton from "../pages/Football/Competition";
 import Teams from "../pages/Football/Teams";
+import CompetitionDetails from '../pages/Football/CompetitionDetails';
+import Competiton from "../pages/Football/Competition";
+
 
 const userRoutes = [
 
 	{ path: "/home", component: Home },	
 
 	//Football
+	{ path: "/football-competitions/:id", component: CompetitionDetails},
 	{ path: "/football-competitions", component: Competiton},
 	{ path: "/football-teams", component: Teams},
 

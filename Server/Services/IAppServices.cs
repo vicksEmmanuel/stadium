@@ -354,7 +354,7 @@ namespace Services
                 };
             }
 
-            data.ImageName = String.Format("{0}://{1}{2}/Images/Competition/Image/{3}", request.Scheme, request.Host, request.PathBase,data.ImageName);
+            data.ImageName = String.Format("{0}://{1}{2}/Images/Competition/{3}", request.Scheme, request.Host, request.PathBase,data.ImageName);
             
             return new UserManagerResponse{
                 Message = "Done",

@@ -25,8 +25,9 @@ namespace Controllers {
         [HttpPost("create/competition/fixture")]
         public async Task<IActionResult> CreateCompetitionFixture ([FromBody] Fixture[] fixtures) {
             if (ModelState.IsValid) {
-
-                var result = await _adminService.CreateCompetitionFixtures(fixtures);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var email = user?.Email;
+                var result = await _adminService.CreateCompetitionFixtures(fixtures, email);
                 
                 if(result.IsSuccess) {
                     return Ok(result);
@@ -42,7 +43,9 @@ namespace Controllers {
         [HttpPost("create/competition/")]
         public async Task<IActionResult>  CreateCompetition([FromForm] Competition competition) {
             if (ModelState.IsValid) {
-                var result = await _adminService.CreateCompetition(competition);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var email = user?.Email;
+                var result = await _adminService.CreateCompetition(competition, email, Request);
                 return Ok(result);
             }
             return BadRequest("Some properties are not valid");

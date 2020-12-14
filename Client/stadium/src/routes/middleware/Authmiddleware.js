@@ -3,10 +3,12 @@ import { Route,Redirect,withRouter } from "react-router-dom";
 
 const Authmiddleware = ({
 	component: Component,
-	layout: Layout
+	layout: Layout,
+	path
 }) => {
 	return (
 		<Route
+			path={path}
 			render={props => {
 			
 			// here you can apply condition

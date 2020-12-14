@@ -24,4 +24,20 @@ module.exports = function(app) {
       changeOrigin: false,
     })
   );
+  app.use(
+    'sport/competition/',
+    createProxyMiddleware({
+      target: 'http://localhost:5000/',
+      secure: false,
+      changeOrigin: false,
+    })
+  );
+  app.use(
+    'competition/',
+    createProxyMiddleware({
+      target: 'http://localhost:5000/',
+      secure: false,
+      changeOrigin: false,
+    })
+  );
 };
