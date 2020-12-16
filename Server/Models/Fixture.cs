@@ -15,6 +15,9 @@ namespace Models
         public DateTime EventTime { get; set; }
         public int Team1Score { get; set; }
         public int Team2Score { get; set; }
+        public int MeetingCount { get; set; }
+        public bool Aggreegate { get; set; }
+        public string VideoLink { get; set; }
 
         [Required]
         public virtual int Team1Id { get; set; }   

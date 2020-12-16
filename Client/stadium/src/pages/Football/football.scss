@@ -27,3 +27,7 @@
     text-align: 'center';
     outline: null;
 }
+
+.fall {
+    animation: moveDown 0.5s ease-in-out;
+}

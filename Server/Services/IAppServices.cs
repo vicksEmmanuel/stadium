@@ -385,7 +385,10 @@ namespace Services
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,
-                Team2Score = x.Team2Score
+                Team2Score = x.Team2Score,
+                MeetingCount = x.MeetingCount,
+                Aggreegate = x.Aggreegate,
+                VideoLink = x.VideoLink
             });
 
             if(data == null) {
@@ -427,7 +430,10 @@ namespace Services
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,
-                Team2Score = x.Team2Score
+                Team2Score = x.Team2Score,
+                MeetingCount = x.MeetingCount,
+                Aggreegate = x.Aggreegate,
+                VideoLink = x.VideoLink
             });
 
             if(data == null) {
@@ -480,7 +486,10 @@ namespace Services
                 Team1Id = x.Team1Id,
                 Team2Id = x.Team2Id,
                 Team1Score = x.Team1Score,
-                Team2Score = x.Team2Score
+                Team2Score = x.Team2Score,
+                MeetingCount = x.MeetingCount,
+                Aggreegate = x.Aggreegate,
+                VideoLink = x.VideoLink
             });
 
             if(data == null) {

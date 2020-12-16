@@ -11,6 +11,10 @@ class UserContainer extends Container {
         }
     }
 
+    goBack = (props) => {
+        props.history.goBack();
+    }
+
     getUser = () => {
         let user = localStorage.getItem(CONSTANTS.SESSIONSTORE);
         if (user) {
